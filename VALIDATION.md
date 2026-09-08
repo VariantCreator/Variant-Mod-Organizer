@@ -11,4 +11,5 @@
 - Installer was compiled, not launched. Fresh installation, GUI behavior, SmartScreen, and antivirus results for this rebuild were not tested.
 - Source ZIP intentionally excludes EXEs, bin/obj directories, runtime bundles and compiler binaries. The compiled embedded mod PAK remains required for the current project; its Unreal source is outside this package.
 
-This package is ready to share for source review subject to the owner's rights to included assets. No public repository upload, license grant, email, or Nexus submission has been performed.
+This package is ready to share for source review subject to the owner's rights to included assets. Published to VariantCreator/Variant-Mod-Organizer for source review at the owner's request. No license grant, email, or Nexus submission has been performed.
+
