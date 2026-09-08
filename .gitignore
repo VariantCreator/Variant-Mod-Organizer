@@ -1,0 +1,7 @@
+**/bin/
+**/obj/
+**/Ready/
+**/Ready-Organizer/
+app-release/
+*.user
+*.suo
