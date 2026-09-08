@@ -10,6 +10,13 @@ public static class NetworkTests
   byte[] bytes="verified new pak"u8.ToArray();string hash=Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
   string Json(string url="https://github.com/VariantCreator/Dova-Locks/releases/download/v9.8.7/Dova-Locks_P.pak",bool draft=false,bool prerelease=false,string? digest=null,long? size=null)=>JsonSerializer.Serialize(new {tag_name="v9.8.7",draft,prerelease,body="Player notes",assets=new[]{new{name=InstallCore.FileName,browser_download_url=url,digest=digest??"sha256:"+hash,size=size??bytes.Length}}});
   var release=ReleaseClient.Parse(Json());if(release.Version!="9.8.7")throw new Exception("version parse");
+  foreach(var tag in new[]{"v1.0.6","v"+InstallCore.Release})
+  {
+   var bundled=ReleaseClient.SelectLatest(JsonSerializer.Serialize(new {tag_name=tag,draft=false,prerelease=false,assets=Array.Empty<object>()}));
+   var payload=await new ReleaseClient().Download(bundled);
+   if(bundled.Version!=InstallCore.Release||bundled.Hash!=InstallCore.PayloadHash||payload.Length==0)throw new Exception("Older or pending publication did not retain current bundle");
+  }
+  Console.WriteLine("PASS: older public release and current release awaiting PAK upload both install the verified current bundle");
   foreach(var json in new[]{Json(url:"https://example.com/mod.pak"),Json(draft:true),Json(prerelease:true),Json(digest:""),Json(size:ReleaseClient.MaxBytes+1L)}){try{ReleaseClient.Parse(json);throw new Exception("Invalid release accepted");}catch(IOException){}}
   Console.WriteLine("PASS: private drafts, prereleases, external files, missing verification and oversized releases rejected");
   var client=new ReleaseClient(new HttpClient(new Fake(bytes)));var got=await client.Download(release);if(!got.SequenceEqual(bytes))throw new Exception("download mismatch");

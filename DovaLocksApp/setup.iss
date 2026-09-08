@@ -1,7 +1,7 @@
 ﻿[Setup]
 AppId={{47B4B066-0BB3-46D9-BC30-EA86F117E8AD}
 AppName=Variant Mod Organizer
-AppVersion=1.3.0
+AppVersion=1.4.0
 AppPublisher=Dova
 AppPublisherURL=https://variantinteractivemap.org
 AppSupportURL=https://github.com/VariantCreator/Dova-Locks/issues

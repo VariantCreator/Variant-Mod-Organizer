@@ -10,7 +10,7 @@ public sealed class ReleaseClient
  public const string Endpoint = "https://api.github.com/repos/VariantCreator/Dova-Locks/releases/latest";
  public const int MaxBytes = 64 * 1024 * 1024;
  readonly HttpClient http;
- public ReleaseClient(HttpClient? client = null) { http = client ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) }; http.DefaultRequestHeaders.UserAgent.ParseAdd("Variant-Mod-Organizer/1.3.0"); }
+ public ReleaseClient(HttpClient? client = null) { http = client ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) }; http.DefaultRequestHeaders.UserAgent.ParseAdd("Variant-Mod-Organizer/1.4.0"); }
  public static ModRelease Parse(string json)
  {
   using var doc = JsonDocument.Parse(json); var root = doc.RootElement;
@@ -27,7 +27,19 @@ public sealed class ReleaseClient
   string notes = root.TryGetProperty("body",out var body) ? body.GetString() ?? "" : "";
   return new(tag.TrimStart('v'),url,digest[7..].ToLowerInvariant(),size,notes.Length > 12000 ? notes[..12000] : notes);
  }
- public async Task<ModRelease> Latest() => Parse(await http.GetStringAsync(Endpoint));
+ public static ModRelease SelectLatest(string json)
+ {
+  using var doc=JsonDocument.Parse(json);var root=doc.RootElement;
+  var tag=root.GetProperty("tag_name").GetString()??"";
+  if(!root.GetProperty("draft").GetBoolean()&&!root.GetProperty("prerelease").GetBoolean()
+    &&Version.TryParse(tag.TrimStart('v'),out var remote)&&remote<=Version.Parse(InstallCore.Release))
+  {
+   using var payload=InstallCore.Payload();
+   return new(InstallCore.Release,"embedded",InstallCore.PayloadHash,payload.Length,"Dova Locks 1.0.7: quicker server version checks, clearer lock menus and improved cleanup. Variant Mod Organizer 1.4.0 adds DovaOutPut diagnostics and a crash report viewer.");
+  }
+  return Parse(json);
+ }
+ public async Task<ModRelease> Latest() => SelectLatest(await http.GetStringAsync(Endpoint));
  public async Task<(ModRelease Release,byte[] Bytes)> CurrentDownload()
  {
   var release=await Latest();var bytes=await Download(release);var current=await Latest();
@@ -36,6 +48,12 @@ public sealed class ReleaseClient
  }
  public async Task<byte[]> Download(ModRelease release)
  {
+  if(release.Url=="embedded")
+  {
+   using var source=InstallCore.Payload();using var copy=new MemoryStream();source.CopyTo(copy);var bundled=copy.ToArray();
+   if(bundled.LongLength!=release.Size||!Convert.ToHexString(SHA256.HashData(bundled)).Equals(release.Hash,StringComparison.OrdinalIgnoreCase))throw new IOException("The included mod could not be verified. Please reinstall the organizer.");
+   return bundled;
+  }
   using var response = await http.GetAsync(release.Url, HttpCompletionOption.ResponseHeadersRead); response.EnsureSuccessStatusCode();
   if (response.Content.Headers.ContentLength is long length && length != release.Size) throw new IOException("The download size changed. Check for updates again.");
   using var input = await response.Content.ReadAsStreamAsync(); using var output = new MemoryStream();
