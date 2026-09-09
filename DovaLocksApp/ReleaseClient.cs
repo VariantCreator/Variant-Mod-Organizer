@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -10,7 +10,7 @@ public sealed class ReleaseClient
  public const string Endpoint = "https://api.github.com/repos/VariantCreator/Dova-Locks/releases/latest";
  public const int MaxBytes = 64 * 1024 * 1024;
  readonly HttpClient http;
- public ReleaseClient(HttpClient? client = null) { http = client ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) }; http.DefaultRequestHeaders.UserAgent.ParseAdd("Variant-Mod-Organizer/1.4.0"); }
+ public ReleaseClient(HttpClient? client = null) { http = client ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) }; http.DefaultRequestHeaders.UserAgent.ParseAdd("Variant-Mod-Organizer/1.5.0"); }
  public static ModRelease Parse(string json)
  {
   using var doc = JsonDocument.Parse(json); var root = doc.RootElement;
@@ -35,7 +35,7 @@ public sealed class ReleaseClient
     &&Version.TryParse(tag.TrimStart('v'),out var remote)&&remote<=Version.Parse(InstallCore.Release))
   {
    using var payload=InstallCore.Payload();
-   return new(InstallCore.Release,"embedded",InstallCore.PayloadHash,payload.Length,"Dova Locks 1.0.7: quicker server version checks, clearer lock menus and improved cleanup. Variant Mod Organizer 1.4.0 adds DovaOutPut diagnostics and a crash report viewer.");
+   return new(InstallCore.Release,"embedded",InstallCore.PayloadHash,payload.Length,"Dova Locks 1.0.8: better protection for wires, pipes, network controls and equipment. Variant Mod Organizer 1.5 adds clearer diagnostics and updates for the organizer itself.");
   }
   return Parse(json);
  }

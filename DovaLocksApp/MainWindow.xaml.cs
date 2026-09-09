@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 using System.IO;
 
@@ -14,6 +14,7 @@ public partial class MainWindow : Window
 
 {
 
+ void UpdateOrganizer(object sender,RoutedEventArgs e){if(!busy)new OrganizerUpdateWindow{Owner=this}.ShowDialog();}
  void OpenWebsite(object sender,RoutedEventArgs e)
  {
   try { Process.Start(new ProcessStartInfo("https://variantinteractivemap.org"){UseShellExecute=true}); }
@@ -81,7 +82,7 @@ public partial class MainWindow : Window
 
  }
 
- void SetBusy(bool value) {busy=value;CheckButton.IsEnabled=BrowseButton.IsEnabled=Locations.IsEnabled=!value;Progress.Visibility=value?Visibility.Visible:Visibility.Collapsed;RefreshPlan();}
+ void SetBusy(bool value) {busy=value;OrganizerUpdateButton.IsEnabled=!value;CheckButton.IsEnabled=BrowseButton.IsEnabled=Locations.IsEnabled=!value;Progress.Visibility=value?Visibility.Visible:Visibility.Collapsed;RefreshPlan();}
 
  public async Task CheckLatest()
 

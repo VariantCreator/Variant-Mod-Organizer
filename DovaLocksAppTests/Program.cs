@@ -21,7 +21,7 @@ if(args.Length==2&&args[0]=="--test-lock-copy")
 string suite = Path.Combine(Path.GetTempPath(), "DovaInstallerTests-" + Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(suite);
 OutputTests.Run(suite);
-CrashReportTests.Run(suite);
+CrashReportTests.Run(suite);await OrganizerUpdateTests.Run(suite);
 byte[] payload = "new-dova-pak-test"u8.ToArray();
 string hash = Convert.ToHexString(SHA256.HashData(payload)).ToLowerInvariant();
 int passed = 0;
@@ -78,3 +78,4 @@ Console.WriteLine($"{passed} checks passed. Test fixtures: {suite}");
 
 OrganizerTests.Run(suite,Game,Check);
 await NetworkTests.Run();
+

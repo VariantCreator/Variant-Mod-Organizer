@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -23,8 +23,8 @@ public record RemovalResult(string Backup, int Removed);
 
 public static class InstallCore
 {
-    public const string Release = "1.0.7";
-    public const string PayloadHash = "bd21f11223bf2432b19054a7910112c3cfd9274dfcd0e3304697d16d81cebb3d";
+    public const string Release = "1.0.8";
+    public const string PayloadHash = "eff68fc8319c0de056ad97c1e783ccde7bd11bfabe859d0088dcdcfa2e764b8f";
     public const string FileName = "Dova-Locks_P.pak";
     // Exact release names, not a broad 'Dova*' wildcard. Other mods are untouched.
     private static readonly Regex PreviousName = new(

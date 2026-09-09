@@ -19,14 +19,22 @@ public partial class DiagnosticsWindow : Window
   InitializeComponent();SourceLabel.Text=source;
   timer.Tick+=async(_,_)=>await Read();Closed+=(_,_)=>{timer.Stop();guard?.Dispose();};
  }
- async void ChooseLog(object sender,RoutedEventArgs e)
+ async void ChooseLog(object sender,RoutedEventArgs e)=>await ChooseReport(false);
+ async void ChooseCrash(object sender,RoutedEventArgs e)=>await ChooseReport(true);
+ async Task ChooseReport(bool crash)
  {
-  var dialog=new OpenFileDialog{Title="Open an Unreal crash report or game log",Filter="Crash reports and logs|*.runtime-xml;*.xml;*.dmp;*.log;*.txt|Unreal crash context|*.runtime-xml;*.xml|Minidumps|*.dmp|Logs|*.log;*.txt|All files|*.*"};
-  if(dialog.ShowDialog(this)!=true)return;selection++;timer.Stop();guard?.Dispose();guard=null;Collect.Content="Start collecting";source=dialog.FileName;SourceLabel.Text=source;collector=null;Role.IsEnabled=true;entries=0;
-  ChooseFile.IsEnabled=false;Collect.IsEnabled=false;Result.Text="Reading the report...";
-  try{var report=await Task.Run(()=>UnrealCrashReport.Read(source));new CrashReportWindow(report){Owner=this}.Show();Result.Text="Report opened in a separate window. Nothing was uploaded.";Collect.IsEnabled=Path.GetExtension(source).Equals(".log",StringComparison.OrdinalIgnoreCase);}
+  var dialog=new OpenFileDialog{Title=crash?"Open an ICARUS crash report":"Open an ICARUS game log",InitialDirectory=DiagnosticPaths.StartFolder(crash),RestoreDirectory=true,CheckFileExists=true,Filter=crash?"Unreal crash reports|*.runtime-xml;*.xml;*.dmp|Unreal crash context|*.runtime-xml;*.xml|Minidumps|*.dmp":"Game logs|*.log"};
+  if(dialog.ShowDialog(this)!=true)return;
+  ChooseFile.IsEnabled=ChooseCrashFile.IsEnabled=false;ReadingProgress.Visibility=Visibility.Visible;Result.Text="Reading the report...";
+  try {
+   string chosen=dialog.FileName;
+   var report=await Task.Run(()=>UnrealCrashReport.Read(chosen));
+   if(!crash){selection++;timer.Stop();guard?.Dispose();guard=null;Collect.Content="Start collecting";source=chosen;SourceLabel.Text=source;collector=null;Role.IsEnabled=true;entries=0;Collect.IsEnabled=true;}
+   new CrashReportWindow(report){Owner=this}.Show();ReportLabel.Text="Opened report: "+chosen;
+   Result.Text=crash?"Crash report opened. Your game-log collection source hasn't changed. Nothing was uploaded.":"Game log opened. Start collecting to copy useful entries into DovaOutPut. Nothing was uploaded.";
+  }
   catch(Exception ex){Result.Text="Couldn't open this report: "+ex.Message;}
-  finally{ChooseFile.IsEnabled=true;}
+  finally{ChooseFile.IsEnabled=ChooseCrashFile.IsEnabled=true;ReadingProgress.Visibility=Visibility.Collapsed;}
  }
  async void Toggle(object sender,RoutedEventArgs e)
  {

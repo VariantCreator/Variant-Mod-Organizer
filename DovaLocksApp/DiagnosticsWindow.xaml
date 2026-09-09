@@ -1,12 +1,15 @@
-<Window x:Class="DovaInstaller.DiagnosticsWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="DovaOutPut" Width="660" Height="520" MinWidth="560" MinHeight="480" WindowStartupLocation="CenterOwner" Background="#111310" Foreground="#F0F1E6" FontFamily="Segoe UI">
+<Window x:Class="DovaInstaller.DiagnosticsWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Diagnostics | Variant Mod Organizer 1.5" Width="720" Height="640" MinWidth="600" MinHeight="560" WindowStartupLocation="CenterOwner" Background="#111310" Foreground="#F0F1E6" FontFamily="Segoe UI">
  <Grid Margin="26"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
  <StackPanel><TextBlock Text="Something acting up?" FontSize="27"/><TextBlock Text="DovaOutPut keeps the useful lock events together. Less log spaghetti." TextWrapping="Wrap" Foreground="#BCAE91" Margin="0,8,0,20"/></StackPanel>
  <Border Grid.Row="1" BorderBrush="#555D48" BorderThickness="1" Background="#1C201A" Padding="18"><StackPanel>
  <TextBlock Text="COLLECT FROM" Foreground="#E7CC93" FontSize="12"/>
  <ComboBox x:Name="Role" SelectedIndex="0" Margin="0,10,0,12"><ComboBoxItem Content="My PC"/><ComboBoxItem Content="Dedicated server log"/></ComboBox>
- <Button x:Name="ChooseFile" Content="Open log or crash report" Click="ChooseLog" HorizontalAlignment="Left"/>
+ <WrapPanel><Button x:Name="ChooseFile" Content="Open game log" Click="ChooseLog" Margin="0,0,10,8"/><Button x:Name="ChooseCrashFile" Content="Open crash report" Click="ChooseCrash" Margin="0,0,0,8"/></WrapPanel>
+ <TextBlock Text="GAME LOG FOR COLLECTION" Foreground="#E7CC93" FontSize="12" Margin="0,8,0,0"/>
  <TextBlock x:Name="SourceLabel" TextWrapping="Wrap" Foreground="#BCAE91" FontSize="12" Margin="0,10,0,12"/>
- <TextBlock x:Name="Result" Text="Keep this window open to collect new entries. Server hosts can download Icarus.log and select it here." TextWrapping="Wrap"/>
+ <TextBlock x:Name="ReportLabel" TextWrapping="Wrap" Foreground="#BCAE91" FontSize="12" Margin="0,0,0,12"/>
+ <ProgressBar x:Name="ReadingProgress" Height="5" IsIndeterminate="True" Visibility="Collapsed" Margin="0,0,0,12"/>
+ <TextBlock x:Name="Result" Text="Crash reports open from ICARUS's Crashes folder. Game logs open from Logs. For a hosted server, choose the Icarus.log you downloaded." TextWrapping="Wrap"/>
  </StackPanel></Border>
  <Grid Grid.Row="2" Margin="0,16,0,0"><Button Content="Open DovaOutPut folder" Click="OpenOutput" HorizontalAlignment="Left"/><Button Content="Start collecting" x:Name="Collect" Click="Toggle" HorizontalAlignment="Right"/></Grid>
  </Grid>

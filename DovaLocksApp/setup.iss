@@ -1,10 +1,10 @@
-﻿[Setup]
+[Setup]
 AppId={{47B4B066-0BB3-46D9-BC30-EA86F117E8AD}
 AppName=Variant Mod Organizer
-AppVersion=1.4.0
+AppVersion=1.5.0
 AppPublisher=Dova
 AppPublisherURL=https://variantinteractivemap.org
-AppSupportURL=https://github.com/VariantCreator/Dova-Locks/issues
+AppSupportURL=https://github.com/VariantCreator/Variant-Mod-Organizer/issues
 DefaultDirName={localappdata}\Programs\Variant Mod Organizer
 DefaultGroupName=Variant Mod Organizer
 DisableProgramGroupPage=yes
@@ -30,6 +30,14 @@ Name: "{autoprograms}\Variant Mod Organizer"; Filename: "{app}\Variant-Mod-Organ
 Name: "{autodesktop}\Variant Mod Organizer"; Filename: "{app}\Variant-Mod-Organizer.exe"; Tasks: desktopicon
 [Run]
 Filename: "{app}\Variant-Mod-Organizer.exe"; Description: "Open Variant Mod Organizer"; Flags: nowait postinstall skipifsilent
+
+Filename: "{app}\Variant-Mod-Organizer.exe"; Flags: nowait; Check: IsOrganizerUpdate
+
+[Code]
+function IsOrganizerUpdate: Boolean;
+begin
+  Result := ExpandConstant('{param:ORGANIZERUPDATE|0}') = '1';
+end;
 
 [InstallDelete]
 Type: files; Name: "{app}\Dova-Locks.exe"

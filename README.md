@@ -2,7 +2,7 @@
 
 An ICARUS mod organizer by Dova. Less folder juggling, more prospecting.
 
-**Current version: 1.4.0. Includes Dova Locks 1.0.7.**
+**Current version: 1.5.0. Includes Dova Locks 1.0.8.**
 
 [Download the Windows installer](https://github.com/VariantCreator/Variant-Mod-Organizer/releases/latest/download/Variant-Mod-Organizer-Installer.exe) · [Nexus page](https://www.nexusmods.com/icarus/mods/329) · [Dova Locks](https://github.com/VariantCreator/Dova-Locks) · [Variant Interactive Map](https://variantinteractivemap.org)
 
@@ -22,11 +22,17 @@ Download the installer above, run it, and open Variant Mod Organizer. Check the 
 
 Use **Add / remove mods** to choose your loadout, then **Launch modded** or **Launch vanilla**. Use **Install / Update** for Dova Locks when your server is on the matching version. Installing Dova Locks is optional.
 
-## What's new in 1.4.0
+## What's new in 1.5
 
-- Includes Dova Locks 1.0.7 and keeps the included version when GitHub has an older release.
-- DovaOutPut diagnostics and a viewer for Unreal crash reports.
-- More room in the diagnostics window so the text can breathe.
+- Update the organizer from inside the app with **Update organizer**. It checks Dova's GitHub release and verifies the download before running setup.
+- **Check mod update** still handles Dova Locks separately. Includes Dova Locks 1.0.8.
+- Separate buttons for game logs and Unreal crash reports. Each opens the right ICARUS folder for your Windows account.
+- Opening a crash report keeps your DovaOutPut collection source intact. No more wandering into a readme and calling it a crash.
+- More room in diagnostics, plus a loading indicator while a report opens.
+
+Install 1.5 once to get the new organizer update button. Future updates use that button and keep your existing app location. The app closes during setup and opens again when it finishes. Your mods and lock saves aren't changed by an organizer update.
+
+DovaOutPut saves collected logs in `%LOCALAPPDATA%\VariantModOrganizer\DovaOutPut`. ICARUS game logs are under `%LOCALAPPDATA%\Icarus\Saved\Logs`; crash reports are under `%LOCALAPPDATA%\Icarus\Saved\Crashes`. For a hosted server, download its log first and choose that file.
 
 Windows 10 (1809 or newer) or Windows 11, 64-bit. The installer includes the app runtime. Steam and ICARUS are required to play, and update checks need internet access.
 

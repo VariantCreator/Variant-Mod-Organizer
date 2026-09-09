@@ -9,7 +9,7 @@ public sealed record UnrealCrashReport(string FilePath,string Details)
  public static UnrealCrashReport Read(string path)
  {
   path=Path.GetFullPath(path);string ext=Path.GetExtension(path).ToLowerInvariant();
-  string details=ext switch {".runtime-xml" or ".xml"=>ReadContext(path),".dmp"=>ReadDump(path),".log" or ".txt"=>ReadLog(path),_=>throw new InvalidDataException("Choose CrashContext.runtime-xml, a .dmp, or a .log file.")};
+  string details=ext switch {".runtime-xml" or ".xml"=>ReadContext(path),".dmp"=>ReadDump(path),".log"=>ReadLog(path),_=>throw new InvalidDataException("Choose CrashContext.runtime-xml, a .dmp, or a .log file.")};
   return new(path,details+"\n\nThis is what Unreal reported. It does not prove that Dova Locks, another mod, or your hardware caused the crash. Keep the original crash folder.");
  }
  static FileStream Open(string path)=>new(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite|FileShare.Delete);
@@ -58,6 +58,7 @@ public sealed record UnrealCrashReport(string FilePath,string Details)
   long start=Math.Max(0,length-limit);if(encoding!=Encoding.UTF8)start-=start%2;file.Position=start;
   byte[] buffer=new byte[(int)(length-start)];int read=0;while(read<buffer.Length){int n=file.Read(buffer,read,buffer.Length-read);if(n==0)break;read+=n;}
   string text=encoding.GetString(buffer,0,read);if(text.Contains('\0'))throw new InvalidDataException("This looks like a binary file. Choose the .dmp or CrashContext.runtime-xml instead.");
+  if(!System.Text.RegularExpressions.Regex.IsMatch(text,@"(?m)^(?:\[[^\r\n]*?\])*\s*Log[\w]+:") && !System.Text.RegularExpressions.Regex.IsMatch(text,@"(?im)^\s*(Fatal error:|Unhandled Exception:|Assertion failed:)"))throw new InvalidDataException("This doesn't look like an Unreal game log. Choose Icarus.log from Saved/Logs, or a crash report from Saved/Crashes.");
   var lines=text.Split('\n');int index=Array.FindLastIndex(lines,s=>s.Contains("Fatal error",StringComparison.OrdinalIgnoreCase)||s.Contains("Unhandled Exception",StringComparison.OrdinalIgnoreCase)||s.Contains("Assertion failed",StringComparison.OrdinalIgnoreCase));
   string heading=index>=0?"CRASH DETAILS FROM LOG":"No explicit crash marker found. Here are the latest log lines.";
   string excerpt=string.Join('\n',lines.Skip(index>=0?Math.Max(0,index-5):Math.Max(0,lines.Length-60)).Take(160));
