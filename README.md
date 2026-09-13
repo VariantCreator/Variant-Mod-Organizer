@@ -2,56 +2,51 @@
 
 An ICARUS mod organizer by Dova. Less folder juggling, more prospecting.
 
-**Current version: 1.5.0. Includes Dova Locks 1.0.8.**
+**Version 1.6. Includes Dova Locks 1.1.**
 
-[Download the Windows installer](https://github.com/VariantCreator/Variant-Mod-Organizer/releases/latest/download/Variant-Mod-Organizer-Installer.exe) Â· [Nexus page](https://www.nexusmods.com/icarus/mods/329) Â· [Dova Locks](https://github.com/VariantCreator/Dova-Locks) Â· [Variant Interactive Map](https://variantinteractivemap.org)
+[Download the Windows installer](https://github.com/VariantCreator/Variant-Mod-Organizer/releases/latest/download/Variant-Mod-Organizer-Installer.exe) · [Nexus page](https://www.nexusmods.com/icarus/mods/329) · [Dova Locks](https://github.com/VariantCreator/Dova-Locks) · [Variant Interactive Map](https://variantinteractivemap.org)
 
-## What you can do
+## What's new
 
-- Import mods and move them between Enabled and Disabled lists with arrows or drag and drop.
-- Launch modded or vanilla ICARUS through Steam, with a confirmation before launch.
-- Install or update Dova Locks with file checks and backups.
-- Manage lock saves and collect useful lock events with DovaOutPut.
-- Open Unreal crash reports to see the available details.
+- Edit lock-save JSON inside the app: choose a save, Edit, then Apply. Both A/B saves are backed up and written together.
+- Active locks show by default. Show inactive locks brings back older records without deleting them.
+- Fixed valid saves being rejected as an unknown lock because of old links.
+- Includes the current Dova Locks 1.1 PAK. Same-version mod updates now check the GitHub file too.
 
-This organizes PAKs; it does not merge mods or automatically fix conflicts between them.
+Less file juggling. Slightly less opportunity to yell at a folder.
 
-## Getting started
+## Use it
 
-Download the installer above, run it, and open Variant Mod Organizer. Check the ICARUS folder it found before making changes. Close the game before adding, removing or updating mods.
+Run the installer, check the ICARUS folder it found, and open **Add / remove mods**. Move PAKs between Enabled and Disabled with the arrows or drag and drop. **Launch modded** and **Launch vanilla** both go through Steam and ask before launching.
 
-Use **Add / remove mods** to choose your loadout, then **Launch modded** or **Launch vanilla**. Use **Install / Update** for Dova Locks when your server is on the matching version. Installing Dova Locks is optional.
+Close ICARUS before changing mods. This app organizes PAKs; it doesn't merge mods or magically make conflicts get along.
 
-## What's new in 1.5
+Use **Install / Update** for Dova Locks and **Update organizer** for the app itself. Downloads are checked against GitHub's file hash before use. Organizer updates keep your install location, mods and lock saves.
 
-- Update the organizer from inside the app with **Update organizer**. It checks Dova's GitHub release and verifies the download before running setup.
-- **Check mod update** still handles Dova Locks separately. Includes Dova Locks 1.0.8.
-- Separate buttons for game logs and Unreal crash reports. Each opens the right ICARUS folder for your Windows account.
-- Opening a crash report keeps your DovaOutPut collection source intact. No more wandering into a readme and calling it a crash.
-- More room in diagnostics, plus a loading indicator while a report opens.
+## Lock saves
 
-Install 1.5 once to get the new organizer update button. Future updates use that button and keep your existing app location. The app closes during setup and opens again when it finishes. Your mods and lock saves aren't changed by an organizer update.
+Choose your `.sav`, open **Edit JSON**, click **Edit**, then **Apply**. The app validates it and backs up both A/B saves before writing. Import and export are also available.
 
-DovaOutPut saves collected logs in `%LOCALAPPDATA%\VariantModOrganizer\DovaOutPut`. ICARUS game logs are under `%LOCALAPPDATA%\Icarus\Saved\Logs`; crash reports are under `%LOCALAPPDATA%\Icarus\Saved\Crashes`. For a hosted server, download its log first and choose that file.
+Active means a PIN and owner exist in the selected save. This is not a live server query. Inactive records stay preserved when hidden.
 
-Windows 10 (1809 or newer) or Windows 11, 64-bit. The installer includes the app runtime. Steam and ICARUS are required to play, and update checks need internet access.
+Stop the world or server first. For a remote server, download both saves and upload both edited replacements afterward. Editing files on your PC doesn't change someone else's server.
 
-## Build
+## Diagnostics
 
-Requires Windows, [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0), and [Inno Setup 6](https://jrsoftware.org/isinfo.php).
+DovaOutPut collects useful lock events locally. **Open game log** starts in the ICARUS Logs folder; **Open crash report** starts in Crashes for your Windows account. For a hosted server, download its log first.
 
-Run from the repository folder:
+Logs are normally under `%LOCALAPPDATA%/Icarus/Saved/Logs`, crashes under `%LOCALAPPDATA%/Icarus/Saved/Crashes`, and collected output under `%LOCALAPPDATA%/VariantModOrganizer/DovaOutPut`.
+
+Windows 10 (1809+) or Windows 11, 64-bit. The installer includes the runtime. Steam and ICARUS are needed to play; update checks need internet.
+
+## Build from source
+
+Requires the .NET 10 SDK and Inno Setup 6. From the repository folder:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\DovaLocksApp\Build-Installer.ps1 -Compiler "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 ```
 
-Adjust the compiler path if needed. The installer is created in `app-release`.
+Adjust the compiler path if needed. The installer appears in `app-release`.
 
-## Tests
-
-```powershell
-dotnet run --project .\DovaLocksAppTests\Tests.csproj -c Release
-```
-
-The tests require internet access for the GitHub download check.
+[Report a problem](https://github.com/VariantCreator/Variant-Mod-Organizer/issues) with the app version and what happened. Keep PINs and private server details out of screenshots.

@@ -12,10 +12,13 @@ if (-not $Compiler -or -not (Test-Path -LiteralPath $Compiler)) {
     throw 'Install Inno Setup 6 and pass -Compiler with the full path to ISCC.exe.'
 }
 Get-Command dotnet -ErrorAction Stop | Out-Null
-$publish = Join-Path $PSScriptRoot 'Ready-Organizer'
+$publish = Join-Path $PSScriptRoot ('publish-staging/' + [Guid]::NewGuid().ToString('N'))
 dotnet publish (Join-Path $PSScriptRoot 'DovaLocksInstaller.csproj') -c Release -r win-x64 --self-contained true -o $publish
 if ($LASTEXITCODE -ne 0) { throw 'App build failed' }
 if (-not (Test-Path -LiteralPath (Join-Path $publish 'Variant-Mod-Organizer.exe'))) { throw 'Published app missing' }
-& $Compiler (Join-Path $PSScriptRoot 'setup.iss')
+foreach ($required in @('Variant-Mod-Organizer.dll','Variant-Mod-Organizer.deps.json','Variant-Mod-Organizer.runtimeconfig.json','coreclr.dll','hostfxr.dll')) {
+    if (-not (Test-Path -LiteralPath (Join-Path $publish $required))) { throw "Missing published dependency: $required" }
+}
+& $Compiler ('/DPublishDir=' + $publish) (Join-Path $PSScriptRoot 'setup.iss')
 if ($LASTEXITCODE -ne 0) { throw 'Windows setup build failed' }
 Get-FileHash -LiteralPath (Join-Path $PSScriptRoot '../app-release/Variant-Mod-Organizer-Installer.exe') -Algorithm SHA256

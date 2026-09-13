@@ -1,7 +1,10 @@
+#ifndef PublishDir
+#define PublishDir "Ready-Organizer"
+#endif
 [Setup]
 AppId={{47B4B066-0BB3-46D9-BC30-EA86F117E8AD}
 AppName=Variant Mod Organizer
-AppVersion=1.5.0
+AppVersion=1.6.0
 AppPublisher=Dova
 AppPublisherURL=https://variantinteractivemap.org
 AppSupportURL=https://github.com/VariantCreator/Variant-Mod-Organizer/issues
@@ -24,7 +27,7 @@ RestartApplications=no
 [Tasks]
 Name: desktopicon; Description: "Create a desktop shortcut"; GroupDescription: "Shortcuts:"; Flags: unchecked
 [Files]
-Source: "Ready-Organizer\Variant-Mod-Organizer.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 [Icons]
 Name: "{autoprograms}\Variant Mod Organizer"; Filename: "{app}\Variant-Mod-Organizer.exe"
 Name: "{autodesktop}\Variant Mod Organizer"; Filename: "{app}\Variant-Mod-Organizer.exe"; Tasks: desktopicon

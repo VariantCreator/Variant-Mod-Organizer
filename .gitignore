@@ -5,3 +5,5 @@
 app-release/
 *.user
 *.suo
+
+**/publish-staging/

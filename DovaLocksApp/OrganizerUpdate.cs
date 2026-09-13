@@ -13,9 +13,9 @@ public sealed class OrganizerUpdate
  public const string Repository="VariantCreator/Variant-Mod-Organizer";
  public const string AssetName="Variant-Mod-Organizer-Installer.exe";
  public const string Endpoint="https://api.github.com/repos/"+Repository+"/releases/latest";
- public static Version CurrentVersion=>Assembly.GetExecutingAssembly().GetName().Version??new Version(1,5,0);
+ public static Version CurrentVersion=>Assembly.GetExecutingAssembly().GetName().Version??new Version(1,6,0);
  readonly HttpClient http;
- public OrganizerUpdate(HttpClient? client=null){http=client??new HttpClient{Timeout=TimeSpan.FromMinutes(5)};http.DefaultRequestHeaders.UserAgent.ParseAdd("Variant-Mod-Organizer/1.5.0");}
+ public OrganizerUpdate(HttpClient? client=null){http=client??new HttpClient{Timeout=TimeSpan.FromMinutes(5)};http.DefaultRequestHeaders.UserAgent.ParseAdd("Variant-Mod-Organizer/1.6.0");}
  public static OrganizerRelease Parse(string json)
  {
   using var doc=JsonDocument.Parse(json);var r=doc.RootElement;

@@ -6,7 +6,7 @@ namespace DovaInstaller;
 
 public sealed record LockPerson(string SteamId, string Name, string Role = "Member", bool Blocked = false);
 public sealed record EditableLock(string Id, LockPerson Owner, string Pin, List<LockPerson> Players, bool RemoveLock = false);
-public sealed record EditableLocks(int Format, string World, int Generation, List<EditableLock> Locks);
+public sealed record EditableLocks(int Format, string World, int Generation, List<EditableLock> Locks, bool ActiveOnly = false);
 
 // Preserve the engine header, property GUIDs and unknown payloads. Only the
 // supported Dova save fields are rewritten; these files are never text-edited.
@@ -83,7 +83,8 @@ public sealed class LockSaveFile
   var ids=Array("RecordIDs");if(ids.Distinct().Count()!=ids.Count)throw new InvalidDataException("Duplicate lock records.");
   foreach(var n in RecordFields) {var a=Array(n);if(a.Count!=ids.Count)throw new InvalidDataException("Incomplete lock records: "+n+" has "+a.Count+" entries for "+ids.Count+" locks.");}
   if(Array("ObjectKeys").Count!=Array("ObjectRecords").Count)throw new InvalidDataException("Incomplete object links.");
-  if(Array("ObjectRecords").Any(id=>!ids.Contains(id)))throw new InvalidDataException("Unknown linked lock.");
+  // The game skips stale object links. Preserve them verbatim rather than rejecting valid lock records.
+  // Do not invent replacement records or silently grant access.
  }
  static string ReadString(BinaryReader r)
  {
@@ -97,6 +98,14 @@ public sealed class LockSaveFile
 
 public static class LockSaveEditor
 {
+ public static bool IsActive(EditableLock value)=>!string.IsNullOrWhiteSpace(value.Pin)&&!string.IsNullOrWhiteSpace(value.Owner.SteamId);
+ public static EditableLocks Filter(EditableLocks source,bool showInactive=false)=>source with {Locks=source.Locks.Where(l=>showInactive||IsActive(l)).ToList(),ActiveOnly=!showInactive};
+ public static EditableLocks MergeView(EditableLocks full,EditableLocks edited)
+ {
+  if(!edited.ActiveOnly)return edited;
+  var replacements=edited.Locks.ToDictionary(l=>l.Id);
+  return edited with {Locks=full.Locks.Select(l=>replacements.GetValueOrDefault(l.Id,l)).ToList(),ActiveOnly=false};
+ }
  public static readonly JsonSerializerOptions JsonOptions=new(){WriteIndented=true,PropertyNamingPolicy=JsonNamingPolicy.CamelCase,PropertyNameCaseInsensitive=true};
  static List<string> Split(string s)=>s.Split('|',StringSplitOptions.RemoveEmptyEntries).ToList();
  static string Join(IEnumerable<string> s)=>string.Join('|',s.Distinct());
@@ -112,9 +121,10 @@ public static class LockSaveEditor
   if(saves.Count==0)throw new FileNotFoundException("No lock save found.");if(saves.Select(s=>s.Text("ProspectID")).Distinct().Count()!=1)throw new InvalidDataException("These A/B files belong to different worlds.");
   return saves.OrderByDescending(s=>s.Number("Generation")).First();
  }
- public static EditableLocks Export(string file)
+ public static EditableLocks Export(string file)=>Export(Latest(file));
+ static EditableLocks Export(LockSaveFile save)
  {
-  var save=Latest(file);var ids=save.Array("RecordIDs");var fields=LockSaveFile.RecordFields.ToDictionary(n=>n,n=>save.Array(n));var records=new List<EditableLock>();
+  var ids=save.Array("RecordIDs");var fields=LockSaveFile.RecordFields.ToDictionary(n=>n,n=>save.Array(n));var records=new List<EditableLock>();
   for(int i=0;i<ids.Count;i++)
   {
    List<string> Get(string n)=>Split(fields[n][i]);var peerIds=Get("PeerIDs");var labels=fields["PeerLabels"][i].Split('|');
@@ -127,11 +137,16 @@ public static class LockSaveEditor
  }
  public static byte[] ApplyEdits(LockSaveFile save,EditableLocks edited)
  {
+  if(edited.Locks==null||edited.Locks.Any(l=>l==null||l.Owner==null||l.Players==null||l.Pin==null||l.Id==null||l.Players.Append(l.Owner).Any(p=>p==null||p.SteamId==null||p.Name==null)))throw new InvalidDataException("Keep the locks, owner, PIN and players fields in the JSON. Empty lists are okay; null fields are not.");
   if(edited.Format!=1||edited.World!=save.Text("ProspectID")||edited.Generation!=save.Number("Generation"))throw new InvalidDataException("The save changed since export. Export a fresh copy before editing.");
-  var ids=save.Array("RecordIDs");if(edited.Locks.Count!=ids.Count||edited.Locks.Select(l=>l.Id).Distinct().Count()!=ids.Count||edited.Locks.Any(l=>!ids.Contains(l.Id)))throw new InvalidDataException("Keep each lock record and its id. Use removeLock to clear a lock.");
+  var ids=save.Array("RecordIDs");var pins=save.Array("PINs");var owners=save.Array("Owners");
+  var required=ids.Where((id,i)=>!edited.ActiveOnly||(!string.IsNullOrWhiteSpace(pins[i])&&!string.IsNullOrWhiteSpace(owners[i]))).ToHashSet();
+  if(edited.Locks.Select(l=>l.Id).Distinct().Count()!=edited.Locks.Count||edited.Locks.Any(l=>!ids.Contains(l.Id))||required.Any(id=>edited.Locks.All(l=>l.Id!=id)))throw new InvalidDataException("Keep each lock record and its id. Use removeLock to clear a lock.");
   var fields=LockSaveFile.RecordFields.ToDictionary(n=>n,n=>save.Array(n));
+  var originalRecords=Export(save).Locks.ToDictionary(l=>l.Id);
   foreach(var record in edited.Locks)
   {
+   if(JsonSerializer.Serialize(record,JsonOptions)==JsonSerializer.Serialize(originalRecords[record.Id],JsonOptions))continue;
    int i=ids.IndexOf(record.Id);void Set(string n,string v)=>fields[n][i]=v;
    if(record.RemoveLock){foreach(var n in LockSaveFile.RecordFields)Set(n,n=="BaseFlags"?"false":"");continue;}
    if(record.Pin!="" && (record.Pin.Length!=4||record.Pin.Any(c=>c<'0'||c>'9')||string.IsNullOrWhiteSpace(record.Owner.SteamId)))throw new InvalidDataException("A locked record needs a four-digit PIN and an owner. Use removeLock to clear it.");

@@ -23,8 +23,8 @@ public record RemovalResult(string Backup, int Removed);
 
 public static class InstallCore
 {
-    public const string Release = "1.0.8";
-    public const string PayloadHash = "eff68fc8319c0de056ad97c1e783ccde7bd11bfabe859d0088dcdcfa2e764b8f";
+    public const string Release = "1.1.0";
+    public const string PayloadHash = "fde1fda04ee1ca3273bfc462999d465439d28e9dd89d023850f9e0d6a7b85e84";
     public const string FileName = "Dova-Locks_P.pak";
     // Exact release names, not a broad 'Dova*' wildcard. Other mods are untouched.
     private static readonly Regex PreviousName = new(

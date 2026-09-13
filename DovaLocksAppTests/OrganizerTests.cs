@@ -46,7 +46,28 @@ static class OrganizerTests
   var saves=Path.Combine(suite,"saves");Directory.CreateDirectory(saves);
   foreach(var suffix in new[]{"A","B"})File.Copy(Path.Combine(AppContext.BaseDirectory,"Fixtures","DovaLocks_ADMIN_FIXTURE_"+suffix+".sav"),Path.Combine(saves,"DovaLocks_ADMIN_FIXTURE_"+suffix+".sav"));
   string a=Path.Combine(saves,"DovaLocks_ADMIN_FIXTURE_A.sav"),b=Path.Combine(saves,"DovaLocks_ADMIN_FIXTURE_B.sav");
-  var bytes=File.ReadAllBytes(a);check(LockSaveFile.Read(bytes).Write().SequenceEqual(bytes),"Unreal-generated save roundtrips without any byte changes");
+  var originalB=File.ReadAllBytes(b);var bytes=File.ReadAllBytes(a);check(LockSaveFile.Read(bytes).Write().SequenceEqual(bytes),"Unreal-generated save roundtrips without any byte changes");
+  // Old object links can outlive removed records in genuine game saves.
+  var orphan=LockSaveFile.Read(bytes);var links=orphan.Array("ObjectRecords");var keys=orphan.Array("ObjectKeys");
+  links.Add("missing-old-lock");keys.Add("retired-object");orphan.SetArray("ObjectRecords",links);orphan.SetArray("ObjectKeys",keys);
+  var orphanBytes=orphan.Write();File.WriteAllBytes(a,orphanBytes);File.WriteAllBytes(b,orphanBytes);
+  var orphanDoc=LockSaveEditor.Export(a);var orphanEdited=LockSaveFile.Read(LockSaveEditor.ApplyEdits(LockSaveEditor.Latest(a),orphanDoc));
+  check(orphanEdited.Array("ObjectRecords").SequenceEqual(links)&&orphanEdited.Array("ObjectKeys").SequenceEqual(keys),"orphan object links survive JSON export and apply without rejecting valid locks");
+  File.WriteAllBytes(a,bytes);File.WriteAllBytes(b,originalB);
+  var filteredSave=LockSaveFile.Read(bytes);
+  foreach(var field in LockSaveFile.RecordFields){var values=filteredSave.Array(field);values.Add(field=="Names"?"Old lock":field=="BaseFlags"?"0":"");filteredSave.SetArray(field,values);}
+  var recordIds=filteredSave.Array("RecordIDs");recordIds.Add("old-inactive");filteredSave.SetArray("RecordIDs",recordIds);
+  File.WriteAllBytes(a,filteredSave.Write());File.WriteAllBytes(b,filteredSave.Write());
+  var complete=LockSaveEditor.Export(a);var active=LockSaveEditor.Filter(complete);
+  check(active.Locks.Count==1&&active.ActiveOnly&&LockSaveEditor.Filter(complete,true).Locks.Count==2,"active filter hides historical locks; Show inactive restores them");
+  var hiddenBefore=LockSaveFile.RecordFields.ToDictionary(f=>f,f=>filteredSave.Array(f)[1]);
+  active.Locks[0]=active.Locks[0] with {Pin="1234"};
+  var filteredResult=LockSaveFile.Read(LockSaveEditor.ApplyEdits(LockSaveFile.Read(filteredSave.Write()),active));
+  check(filteredResult.Array("PINs")[0]=="1234"&&LockSaveFile.RecordFields.All(f=>filteredResult.Array(f)[1]==hiddenBefore[f]),"filtered JSON edit preserves every hidden record field");
+  var merged=LockSaveEditor.MergeView(complete,active);check(merged.Locks.Count==2&&merged.Locks[1].Id=="old-inactive","JSON view merges into full list without dropping inactive locks");
+  try{LockSaveEditor.ApplyEdits(LockSaveFile.Read(filteredSave.Write()),active with {Locks=[]});throw new Exception("missing active record accepted");}catch(InvalidDataException){}
+  check(true,"filtered import rejects missing active locks rather than silently deleting them");
+  File.WriteAllBytes(a,bytes);File.WriteAllBytes(b,originalB);
   var doc=LockSaveEditor.Export(a);check(doc.Generation==11&&doc.Locks[0].Owner.Name=="Example Owner","editor reads latest A/B generation and names");
   string removed=doc.Locks[0].Players[0].SteamId;doc.Locks[0].Players.RemoveAt(0);var edit=Path.Combine(saves,"edit.json");File.WriteAllText(edit,JsonSerializer.Serialize(doc,LockSaveEditor.JsonOptions));
   string saveBackup=LockSaveEditor.Import(a,edit);var after=LockSaveFile.Read(File.ReadAllBytes(a));
