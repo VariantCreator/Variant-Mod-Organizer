@@ -1,8 +1,10 @@
 # Compatibility patches
 
-Auto patch works with any mod author’s prepared compatibility files. It applies a matching patch; it cannot combine arbitrary Blueprint code.
+Auto patch works with any mod authorâ€™s prepared compatibility files. It applies a matching patch; it cannot combine arbitrary Blueprint code.
 
 Dova Locks 1.1.6 with Pickup and Move 1.0 is recognized automatically. Select both mods, analyze, and click **Auto patch**. The original mod files stay untouched.
+
+**Merge anyway** is a separate manual override. It exports the later mod's versions for unresolved conflicts after a warning. It does not make those versions compatible or mark the conflicts as patched.
 
 ## For mod authors
 
@@ -19,7 +21,7 @@ Ship your compiled replacement assets in a PAK with an EXMOD descriptor, or in a
 
 Keep related `.uasset` and `.uexp` files together. Include other changed companions too. If a companion stays unchanged, list its expected hash in `Requires`.
 
-The Organizer checks every conflicting revision against the patch’s supported hashes, verifies the replacement bytes and dependencies, and leaves unrelated conflicts alone. Changed inputs require another analysis. Conflicting data values still require the user’s choice.
+The Organizer checks every conflicting revision against the patchâ€™s supported hashes, verifies the replacement bytes and dependencies, and leaves unrelated conflicts alone. Changed inputs require another analysis. Conflicting data values still require the userâ€™s choice.
 
 If two matching patches propose different replacements for the same file, Auto patch will not choose between them. Select the correct patch for your mod list. After updating a patch, update its file hashes as well.
 

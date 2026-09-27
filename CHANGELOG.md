@@ -2,7 +2,8 @@
 
 - Added **Auto patch** to the merge window. Apply a matching compatibility patch, then build.
 - Supports patches from any mod author, with Dova Locks 1.1.6 + Pickup and Move 1.0 included.
-- Clearer conflict messages. Unknown conflicts still need a patch; the button is clever, not psychic.
+- Added a separate **Merge anyway** button for choosing the later mod's files despite conflicts.
+- Clearer patch and conflict messages. Auto patch is clever, not psychic; forcing a merge can still break things.
 
 Beta, provided as-is.
 
