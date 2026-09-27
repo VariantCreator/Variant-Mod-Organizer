@@ -1,19 +1,17 @@
-# Changelog
+# 1.7 beta
 
-## 1.6 beta
+- Added **Auto patch** to the merge window. Apply a matching compatibility patch, then build.
+- Supports patches from any mod author, with Dova Locks 1.1.6 + Pickup and Move 1.0 included.
+- Clearer conflict messages. Unknown conflicts still need a patch; the button is clever, not psychic.
 
 Beta, provided as-is.
 
-- Removed bundled Dova Locks and automatic mod downloads.
-- Added optional local mod merging with conflict review.
-- Added IMM merged PAK imports with a choice of originals to disable.
-- Easier save editing with search, undo, change review and A/B backups.
-- Added a portable ZIP and a visible organizer update setup.
+# 1.6 beta
 
-This replaces the earlier 1.6 download. Existing 1.6 users should reinstall manually.
+- Local Dova Locks imports; no automatic downloads or bundled mod.
+- Optional mod merging with conflict review.
+- IMM merged PAK imports with a choice of originals to disable.
+- Easier save editing, search, undo and a review before saving.
+- Portable ZIP and visible organizer update setup.
 
-## 1.5
-
-- Added in-app organizer updates.
-- Separate game log and Unreal crash report buttons.
-- Clearer diagnostics with more room and loading feedback.
+Beta, provided as-is.
