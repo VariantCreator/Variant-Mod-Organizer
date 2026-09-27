@@ -1,13 +1,16 @@
 # Changelog
 
-## 1.6
+## 1.6 beta
 
-- Edit lock-save JSON inside the app: choose a save, Edit, then Apply. Both A/B saves are backed up and written together.
-- Active locks show by default. Show inactive locks brings back older records without deleting them.
-- Fixed valid saves being rejected as an unknown lock because of old links.
-- Includes the current Dova Locks 1.1 PAK. Same-version mod updates now check the GitHub file too.
+Beta, provided as-is.
 
-Less file juggling. Slightly less opportunity to yell at a folder.
+- Removed bundled Dova Locks and automatic mod downloads.
+- Added optional local mod merging with conflict review.
+- Added IMM merged PAK imports with a choice of originals to disable.
+- Easier save editing with search, undo, change review and A/B backups.
+- Added a portable ZIP and a visible organizer update setup.
+
+This replaces the earlier 1.6 download. Existing 1.6 users should reinstall manually.
 
 ## 1.5
 
