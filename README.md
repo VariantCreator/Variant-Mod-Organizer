@@ -25,4 +25,4 @@ IMM-merged Dova Locks uses the same save editor. Merging PAKs does not combine w
 [Downloads and support](https://github.com/VariantCreator/Variant-Mod-Organizer)
 [Variant website](https://variantinteractivemap.org)
 
-[Compatibility patch format for mod authors](COMPATIBILITY.md)
+[Compatibility patch format for mod authors](https://github.com/VariantCreator/Variant-Mod-Organizer/blob/main/COMPATIBILITY.md)
